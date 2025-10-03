@@ -9,7 +9,7 @@
             <h1>User List</h1>
         </div>
         <div class=" col-6 text-end">
-            <a href="/create" class="btn btn-primary">Create + </a>
+            <a href="/create" class="btn btn-sm  btn-outline-primary">Create + </a>
         </div>
     </div>
 
@@ -32,31 +32,40 @@
         <thead class="table-info">
             <tr>
                 <th>#</th>
+                <th>Image</th>
                 <th>Name</th>
                 <th>Email</th>
-                <th>Image</th>
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
             @forelse ($users as $index => $user)
             <tr>
                 <td>{{ $index + 1 }}</td>
-                <td>{{ $user->name }}</td>
-                <td>{{ $user->email }}</td>
                 <td>
                     @if ($user->image)
                     <img src="{{ asset('storage/' . $user->image) }}" alt="User Image" width="60" height="60" class="rounded-circle">
                     @else
                     <span class="text-muted">No Image</span>
                     @endif
-                    <a href="{{ url('/edit/' . $user->id) }}" class="btn btn-info">Edit</a>
-                    <a href="{{ url('/delete/' . $user->id) }}" class="btn btn-danger">Del</a>
 
                 </td>
+                <td>{{ $user->name }}</td>
+                <td>{{ $user->email }}</td>
+
+                <td class="text-center">
+                    <a href="{{ url('/edit/' . $user->id) }}" class="btn btn-sm btn-outline-info">Edit</a>
+                    <a href="{{ url('/delete/' . $user->id) }}"
+                        class="btn btn-sm btn-outline-danger"
+                        onclick="return confirm('Are you sure you want to delete this user?');">
+                        Del
+                    </a>
+                </td>
+
             </tr>
             @empty
             <tr>
-                <td colspan="4" class="text-center">No users found.</td>
+                <td colspan="4" class="text-end">No users found.</td>
             </tr>
             @endforelse
         </tbody>

@@ -15,13 +15,13 @@ class UserJob implements ShouldQueue
 
     protected string $action;
     protected array $data;
-    protected ?int $userId;
+    protected ?string $userId;
 
-    public function __construct(string $action, array $data = [], ?int $userId = null)
+    public function __construct(string $action, array $data = [], ?string $userId = null)
     {
         $this->action = $action;
         $this->data   = $data;
-        $this->userId = $userId;
+        $this->userId = (string) $userId; // always cast to string
     }
 
     public function handle(): void

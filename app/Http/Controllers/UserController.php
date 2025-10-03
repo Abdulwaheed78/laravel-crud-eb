@@ -12,7 +12,7 @@ class UserController extends Controller
     // Show all users
     public function index()
     {
-        $users = User::all();
+        $users = User::orderBy('_id','desc')->get();
         return view('index', compact('users'));
     }
 
@@ -54,9 +54,10 @@ class UserController extends Controller
     {
         $request->validate([
             'name'  => 'required|string|max:255',
-            'email' => "required|email|unique:users,email,$id",
+            'email' => "required|email|unique:users,email,$id,_id",
             'image' => 'nullable|image|max:2048',
         ]);
+
 
         $user = User::findOrFail($id);
 
