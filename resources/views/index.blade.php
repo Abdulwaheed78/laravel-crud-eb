@@ -49,6 +49,9 @@
                     @else
                     <span class="text-muted">No Image</span>
                     @endif
+                    <a href="{{ url('/edit/' . $user->id) }}" class="btn btn-info">Edit</a>
+                    <a href="{{ url('/delete/' . $user->id) }}" class="btn btn-danger">Del</a>
+
                 </td>
             </tr>
             @empty

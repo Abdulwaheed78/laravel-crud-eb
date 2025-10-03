@@ -19,4 +19,7 @@ Route::get('/create',function(){
     return view('create');
 });
 Route::post('/create',[UserController::class,'create']);
+Route::get('/edit/{id}',[UserController::class,'edit']);
+Route::put('/update/{id}',[UserController::class,'update']);
+
 
