@@ -3,7 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\User;  // Import User model
+use App\Models\User;
+use App\Jobs\UserJob;
 use Illuminate\Support\Facades\Storage;
 
 class UserController extends Controller
@@ -18,25 +19,25 @@ class UserController extends Controller
     // Store a new user
     public function create(Request $request)
     {
-        // Validate inputs
         $request->validate([
-            'name' => 'required|string|max:255',
+            'name'  => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
-            'image' => 'nullable|image|max:2048',  // max 2MB image
+            'image' => 'nullable|image|max:2048',
         ]);
 
-        // Handle image upload
         $imagePath = null;
         if ($request->hasFile('image')) {
             $imagePath = $request->file('image')->store('users', 'public');
         }
 
-        // Create user
-        User::create([
-            'name' => $request->name,
+        $user = User::create([
+            'name'  => $request->name,
             'email' => $request->email,
             'image' => $imagePath,
         ]);
+
+        // dispatch log job
+        UserJob::dispatch('create', [], $user->id);
 
         return redirect()->route('index')->with('success', 'User created successfully!');
     }
@@ -48,33 +49,30 @@ class UserController extends Controller
         return view('edit', compact('user'));
     }
 
-    // Update user info
+    // Update user
     public function update(Request $request, $id)
     {
-        $user = User::findOrFail($id);
-
-        // Validate inputs
         $request->validate([
-            'name' => 'required|string|max:255',
+            'name'  => 'required|string|max:255',
             'email' => "required|email|unique:users,email,$id",
             'image' => 'nullable|image|max:2048',
         ]);
 
-        // Handle image update
+        $user = User::findOrFail($id);
+
         if ($request->hasFile('image')) {
-            // Delete old image if exists
             if ($user->image && Storage::disk('public')->exists($user->image)) {
                 Storage::disk('public')->delete($user->image);
             }
-            $imagePath = $request->file('image')->store('users', 'public');
-            $user->image = $imagePath;
+            $user->image = $request->file('image')->store('users', 'public');
         }
 
-        // Update fields
         $user->name = $request->name;
         $user->email = $request->email;
-
         $user->save();
+
+        // dispatch log job
+        UserJob::dispatch('update', [], $user->id);
 
         return redirect()->route('index')->with('success', 'User updated successfully!');
     }
@@ -84,12 +82,14 @@ class UserController extends Controller
     {
         $user = User::findOrFail($id);
 
-        // Delete image file if exists
         if ($user->image && Storage::disk('public')->exists($user->image)) {
             Storage::disk('public')->delete($user->image);
         }
 
         $user->delete();
+
+        // dispatch log job
+        UserJob::dispatch('delete', [], $id);
 
         return redirect()->route('index')->with('success', 'User deleted successfully!');
     }

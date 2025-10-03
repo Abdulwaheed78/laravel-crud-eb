@@ -33,6 +33,14 @@ return [
         'sync' => [
             'driver' => 'sync',
         ],
+        
+        'beanstalkd' => [
+            'driver' => 'beanstalkd',
+            'host' => env('BEANSTALKD_HOST', '127.0.0.1'),
+            'queue' => env('BEANSTALKD_QUEUE', 'default'),
+            'retry_after' => 90,
+        ],
+
 
         'database' => [
             'driver' => 'database',
