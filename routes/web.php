@@ -2,7 +2,7 @@
 
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
-
+use App\Http\Controllers\StudentController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -14,14 +14,21 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/',[UserController::class,'index'])->name('index');
-Route::get('/create',function(){
-    return view('create');
+
+//defalut route onload 
+Route::get('/', [StudentController::class, 'index'])->name('index');
+
+//users route
+Route::get('/user/index', [UserController::class, 'index'])->name('userIndex');
+Route::get('/user/create', function () {
+    return view('users.create');
 });
-Route::post('/create',[UserController::class,'create']);
-Route::get('/edit/{id}',[UserController::class,'edit']);
-Route::put('/update/{id}',[UserController::class,'update']);
+Route::post('/user/create', [UserController::class, 'create'])->name('userCreate');
+Route::get('/user/edit/{id}', [UserController::class, 'edit'])->name('userEdit');
+Route::put('/user/update/{id}', [UserController::class, 'update'])->name('userUpdate');
+Route::get('/user/delete/{id}', [UserController::class, 'delete'])->name('userDelete');
 
-Route::get('/delete/{id}',[UserController::class,'delete']);
-
-
+//Students Route
+Route::get('/students/upload', [StudentController::class, 'showUploadForm'])->name('students.upload.form');
+Route::post('/students/upload', [StudentController::class, 'uploadCsv'])->name('students.upload.csv');
+Route::resource('students', StudentController::class);

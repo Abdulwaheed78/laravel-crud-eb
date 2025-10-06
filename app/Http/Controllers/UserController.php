@@ -13,7 +13,7 @@ class UserController extends Controller
     public function index()
     {
         $users = User::orderBy('_id','desc')->get();
-        return view('index', compact('users'));
+        return view('users.index', compact('users'));
     }
 
     // Store a new user
@@ -39,14 +39,14 @@ class UserController extends Controller
         // dispatch log job
         UserJob::dispatch('create', [], $user->id);
 
-        return redirect()->route('index')->with('success', 'User created successfully!');
+        return redirect()->route('userIndex')->with('success', 'User created successfully!');
     }
 
     // Show edit form
     public function edit($id)
     {
         $user = User::findOrFail($id);
-        return view('edit', compact('user'));
+        return view('users.edit', compact('user'));
     }
 
     // Update user
@@ -75,7 +75,7 @@ class UserController extends Controller
         // dispatch log job
         UserJob::dispatch('update', [], $user->id);
 
-        return redirect()->route('index')->with('success', 'User updated successfully!');
+        return redirect()->route('userIndex')->with('success', 'User updated successfully!');
     }
 
     // Delete user
@@ -92,6 +92,6 @@ class UserController extends Controller
         // dispatch log job
         UserJob::dispatch('delete', [], $id);
 
-        return redirect()->route('index')->with('success', 'User deleted successfully!');
+        return redirect()->route('userIndex')->with('success', 'User deleted successfully!');
     }
 }

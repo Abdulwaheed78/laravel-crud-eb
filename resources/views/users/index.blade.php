@@ -9,7 +9,7 @@
             <h1>User List</h1>
         </div>
         <div class=" col-6 text-end">
-            <a href="/create" class="btn btn-sm  btn-outline-primary">Create + </a>
+            <a href="/user/create" class="btn btn-sm  btn-outline-primary">Create + </a>
         </div>
     </div>
 
@@ -54,8 +54,8 @@
                 <td>{{ $user->email }}</td>
 
                 <td class="text-center">
-                    <a href="{{ url('/edit/' . $user->id) }}" class="btn btn-sm btn-outline-info">Edit</a>
-                    <a href="{{ url('/delete/' . $user->id) }}"
+                    <a href="{{ url('/user/edit/' . $user->id) }}" class="btn btn-sm btn-outline-info">Edit</a>
+                    <a href="{{ url('/user/delete/' . $user->id) }}"
                         class="btn btn-sm btn-outline-danger"
                         onclick="return confirm('Are you sure you want to delete this user?');">
                         Del
