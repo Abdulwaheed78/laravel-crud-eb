@@ -4,8 +4,7 @@ namespace App\Jobs;
 
 use App\Models\Student;
 use App\Helpers\StudentHelper;
-use App\Events\StudentJobCompleted;
-use App\Events\StudentJobFailed;
+use App\Events\StudentActionEvent;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -37,10 +36,9 @@ class StudentJob implements ShouldQueue
     public function handle(): void
     {
         try {
-            // 👇 Simulate slow processing (for demo/testing)
-            sleep(20);
+            //sleep(5); // Optional delay for demo
 
-            Log::info('Processing StudentJob', [
+            Log::info('🎯 Starting StudentJob', [
                 'action' => $this->action,
                 'data'   => $this->data
             ]);
@@ -62,18 +60,15 @@ class StudentJob implements ShouldQueue
                     throw new \Exception("Unknown StudentJob action: {$this->action}");
             }
 
-            // ✅ Fire job completed event
-            event(new StudentJobCompleted($this->action, $this->data));
-
         } catch (Throwable $e) {
-            // ❌ Log and fire failure event
-            Log::error("StudentJob failed: {$e->getMessage()}", [
+            Log::error("❌ StudentJob failed: {$e->getMessage()}", [
                 'action' => $this->action,
                 'data'   => $this->data,
                 'trace'  => $e->getTraceAsString(),
             ]);
 
-            event(new StudentJobFailed($this->action, $this->data, $e));
+            // Fire failure event globally
+            event(new StudentActionEvent($this->action, null, false));
         }
     }
 
@@ -91,9 +86,12 @@ class StudentJob implements ShouldQueue
         $data = $validated['data'];
         $data['password'] = Hash::make($data['password'] ?? '123456');
 
-        Student::create($data);
-
+        $student = Student::create($data);
         Log::info('✅ Student created successfully via Job.');
+
+        // Fire success event
+        event(new StudentActionEvent('created', $student, true));
+        Log::info('🚀 StudentActionEvent fired for CREATE.');
     }
 
     /**
@@ -120,7 +118,11 @@ class StudentJob implements ShouldQueue
         }
 
         $student->update($data);
-        Log::info('✅ Student updated successfully via Job.');
+        Log::info('✏️ Student updated successfully via Job.');
+
+        // Fire success event
+        event(new StudentActionEvent('updated', $student, true));
+        Log::info('🚀 StudentActionEvent fired for UPDATE.');
     }
 
     /**
@@ -132,7 +134,16 @@ class StudentJob implements ShouldQueue
             throw new \Exception('Delete action called without ID');
         }
 
-        Student::destroy($this->data['id']);
+        $student = Student::find($this->data['id']);
+        if (!$student) {
+            throw new \Exception("Student not found for delete: {$this->data['id']}");
+        }
+
+        $student->delete();
         Log::info('🗑️ Student deleted successfully via Job.', ['id' => $this->data['id']]);
+
+        // Fire success event
+        event(new StudentActionEvent('deleted', $student, true));
+        Log::info('🚀 StudentActionEvent fired for DELETE.');
     }
 }

@@ -6,6 +6,8 @@ use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Event;
+use App\Events\StudentActionEvent;
+use App\Listeners\StudentActionListener;
 
 class EventServiceProvider extends ServiceProvider
 {
@@ -18,11 +20,8 @@ class EventServiceProvider extends ServiceProvider
         Registered::class => [
             SendEmailVerificationNotification::class,
         ],
-        App\Events\StudentJobCompleted::class => [
-            App\Listeners\LogStudentJobCompletion::class,
-        ],
-        App\Events\StudentJobFailed::class => [
-            App\Listeners\LogStudentJobFailure::class,
+        \App\Events\StudentActionEvent::class => [
+            \App\Listeners\StudentActionListener::class,
         ],
     ];
 

@@ -80,11 +80,11 @@ class StudentController extends Controller
         }
         $data['id'] = $id;
 
-        for ($i = 1; $i <= 10; $i++) {
-            StudentJob::dispatch('update', $data);
-        } // for 10 times update
+        // for ($i = 1; $i <= 10; $i++) {
+        //     StudentJob::dispatch('update', $data);
+        // } // for 10 times update
 
-        // StudentJob::dispatch('update', $data);
+        StudentJob::dispatch('update', $data);
         // 🔁 Redirect back to create page with flash message
         return redirect()
             ->back()
