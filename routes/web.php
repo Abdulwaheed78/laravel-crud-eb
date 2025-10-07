@@ -3,6 +3,7 @@
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\StudentController;
+use App\Http\Controllers\ImageController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -32,3 +33,8 @@ Route::get('/user/delete/{id}', [UserController::class, 'delete'])->name('userDe
 Route::get('/students/upload', [StudentController::class, 'showUploadForm'])->name('students.upload.form');
 Route::post('/students/upload', [StudentController::class, 'uploadCsv'])->name('students.upload.csv');
 Route::resource('students', StudentController::class);
+
+
+//images direct upload to db 
+Route::get('/images', [ImageController::class, 'index'])->name('images.index');
+Route::post('/images', [ImageController::class, 'store'])->name('images.store');

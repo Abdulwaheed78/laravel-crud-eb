@@ -12,6 +12,9 @@
             <a href="{{ route('students.create') }}" class="btn btn-sm btn-outline-primary me-2">
                 Create +
             </a>
+             <a href="{{ route('images.index') }}" class="btn btn-sm btn-outline-info">
+                Upload Image +
+            </a>
             <a href="{{ route('students.upload.form') }}" class="btn btn-sm btn-outline-success">
                 Upload CSV
             </a>

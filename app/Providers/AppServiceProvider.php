@@ -21,15 +21,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        $this->app->booted(function () {
-            \Illuminate\Support\Facades\View::composer('*', function ($view) {
-                try {
-                    $activities = \App\Models\StudentActivity::latest()->take(10)->get();
-                } catch (\Throwable $e) {
-                    $activities = collect(); // fallback empty
-                }
-                $view->with('activities', $activities);
-            });
-        });
+       //
     }
 }

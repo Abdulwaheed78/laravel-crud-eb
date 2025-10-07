@@ -49,6 +49,9 @@
                     <li class="nav-item">
                         <a class="nav-link {{ request()->is('user/*') ? 'active' : '' }}" href="/user/index">Users</a>
                     </li>
+                      <li class="nav-item">
+                        <a class="nav-link {{ request()->is('images/*') ? 'active' : '' }}" href="{{route('images.index')}}">Images</a>
+                    </li>
                 </ul>
 
                 <!-- {{-- 🔔 Notification Dropdown --}}
