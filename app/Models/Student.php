@@ -31,7 +31,7 @@ class Student extends Authenticatable
         'grade',
         'website',
         'favorite_color',
-        'secret_token',
+        // 'secret_token', //no need for now 
         'password',
         'hobbies',
     ];

@@ -112,9 +112,11 @@
         </div>
     </div>
 
-    {{-- Pagination (if using paginate()) --}}
-    <div class="mt-3">
-        {{ $students->links() }}
+    <div class="mt-3 d-flex justify-content-center">
+        <nav aria-label="Page navigation" class="pagination-wrapper">
+            {{ $students->links('pagination::bootstrap-5') }}
+        </nav>
     </div>
+
 </div>
 @endsection
