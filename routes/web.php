@@ -4,6 +4,7 @@ use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\ImageController;
+use App\Http\Controllers\NotificationController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -38,3 +39,8 @@ Route::resource('students', StudentController::class);
 //images direct upload to db 
 Route::get('/images', [ImageController::class, 'index'])->name('images.index');
 Route::post('/images', [ImageController::class, 'store'])->name('images.store');
+
+
+//for notification
+Route::get('/notifications', [NotificationController::class, 'index']);
+Route::post('/notifications/mark-as-read', [NotificationController::class, 'markAsRead']);

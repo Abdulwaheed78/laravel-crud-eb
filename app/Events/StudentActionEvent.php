@@ -12,13 +12,13 @@ class StudentActionEvent
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     public string $action;
-    public ?Student $student;
+    public ?string $studentId;
     public bool $status;
 
-    public function __construct(string $action, ?Student $student = null, bool $status = true)
+    public function __construct(string $action, ?string $studentId = null, bool $status = true)
     {
         $this->action = $action;
-        $this->student = $student;
+        $this->studentId = $studentId;
         $this->status = $status;
     }
 }

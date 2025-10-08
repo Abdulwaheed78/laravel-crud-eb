@@ -59,7 +59,6 @@ class StudentJob implements ShouldQueue
                 default:
                     throw new \Exception("Unknown StudentJob action: {$this->action}");
             }
-
         } catch (Throwable $e) {
             Log::error("❌ StudentJob failed: {$e->getMessage()}", [
                 'action' => $this->action,
@@ -90,7 +89,7 @@ class StudentJob implements ShouldQueue
         Log::info('✅ Student created successfully via Job.');
 
         // Fire success event
-        event(new StudentActionEvent('created', $student, true));
+        event(new StudentActionEvent('created', $student->id, true));
         Log::info('🚀 StudentActionEvent fired for CREATE.');
     }
 
@@ -121,7 +120,7 @@ class StudentJob implements ShouldQueue
         Log::info('✏️ Student updated successfully via Job.');
 
         // Fire success event
-        event(new StudentActionEvent('updated', $student, true));
+        event(new StudentActionEvent('updated', $student->id, true));
         Log::info('🚀 StudentActionEvent fired for UPDATE.');
     }
 
@@ -139,11 +138,11 @@ class StudentJob implements ShouldQueue
             throw new \Exception("Student not found for delete: {$this->data['id']}");
         }
 
-        $student->delete();
-        Log::info('🗑️ Student deleted successfully via Job.', ['id' => $this->data['id']]);
+        $student->update(['is_active' => 0]);
+        Log::info('🚫 Student deactivated successfully via Job.', ['id' => $this->data['id']]);
 
         // Fire success event
-        event(new StudentActionEvent('deleted', $student, true));
+        event(new StudentActionEvent('deactivated', $student->id, true));
         Log::info('🚀 StudentActionEvent fired for DELETE.');
     }
 }
