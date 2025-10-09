@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\Models\Student;
+use App\Models\Notification;
 use App\Helpers\StudentHelper;
 use App\Events\StudentActionEvent;
 use Illuminate\Bus\Queueable;
@@ -21,41 +22,30 @@ class StudentJob implements ShouldQueue
     protected string $action;
     protected array $data;
 
-    /**
-     * Create a new job instance.
-     */
     public function __construct(string $action, array $data = [])
     {
         $this->action = $action;
         $this->data = $data;
     }
 
-    /**
-     * Execute the job.
-     */
     public function handle(): void
     {
         try {
-            //sleep(5); // Optional delay for demo
-
             Log::info('🎯 Starting StudentJob', [
                 'action' => $this->action,
-                'data'   => $this->data
+                'data'   => $this->data,
             ]);
 
             switch ($this->action) {
                 case 'create':
                     $this->handleCreate();
                     break;
-
                 case 'update':
                     $this->handleUpdate();
                     break;
-
                 case 'delete':
                     $this->handleDelete();
                     break;
-
                 default:
                     throw new \Exception("Unknown StudentJob action: {$this->action}");
             }
@@ -63,10 +53,16 @@ class StudentJob implements ShouldQueue
             Log::error("❌ StudentJob failed: {$e->getMessage()}", [
                 'action' => $this->action,
                 'data'   => $this->data,
-                'trace'  => $e->getTraceAsString(),
             ]);
 
-            // Fire failure event globally
+            // 🔔 Notify error in MongoDB
+            $this->notify(
+                'Student Job Error',
+                ucfirst($this->action) . ' Operation Failed',
+                $e->getMessage()
+            );
+
+            // 🔥 Trigger global event (failed)
             event(new StudentActionEvent($this->action, null, false));
         }
     }
@@ -88,9 +84,15 @@ class StudentJob implements ShouldQueue
         $student = Student::create($data);
         Log::info('✅ Student created successfully via Job.');
 
-        // Fire success event
         event(new StudentActionEvent('created', $student->id, true));
-        Log::info('🚀 StudentActionEvent fired for CREATE.');
+
+        // ✅ Optional success notification
+        $this->notify(
+            'Student',
+            'Student Created Successfully',
+            "Student {$student->name} (ID: {$student->id}) has been added.",
+            $student->id
+        );
     }
 
     /**
@@ -119,9 +121,15 @@ class StudentJob implements ShouldQueue
         $student->update($data);
         Log::info('✏️ Student updated successfully via Job.');
 
-        // Fire success event
         event(new StudentActionEvent('updated', $student->id, true));
-        Log::info('🚀 StudentActionEvent fired for UPDATE.');
+
+        // ✅ Success notification
+        $this->notify(
+            'Student',
+            'Student Updated Successfully',
+            "Student {$student->name} (ID: {$student->id}) updated.",
+            $student->id
+        );
     }
 
     /**
@@ -141,8 +149,35 @@ class StudentJob implements ShouldQueue
         $student->update(['is_active' => 0]);
         Log::info('🚫 Student deactivated successfully via Job.', ['id' => $this->data['id']]);
 
-        // Fire success event
         event(new StudentActionEvent('deactivated', $student->id, true));
-        Log::info('🚀 StudentActionEvent fired for DELETE.');
+
+        // ✅ Success notification
+        $this->notify(
+            'Student',
+            'Student Deactivated',
+            "Student {$student->name} (ID: {$student->id}) has been deactivated.",
+            $student->id
+        );
+    }
+
+    /**
+     * 🔔 Create a notification safely.
+     */
+    private function notify(string $type, string $title, string $message, ?string $relatedId = null): void
+    {
+        try {
+            Notification::create([
+                'type' => $type,
+                'title' => $title,
+                'message' => $message,
+                'related_id' => $relatedId,
+                'related_model' => Student::class,
+                'is_read' => false,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        } catch (Throwable $e) {
+            Log::error('❗ Failed to create notification: ' . $e->getMessage());
+        }
     }
 }

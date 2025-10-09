@@ -3,20 +3,8 @@
 @section('title', 'Edit User')
 
 @section('content')
-<div class="container d-flex justify-content-center align-items-center" style="min-height: 100vh;">
+<div class="container d-flex justify-content-center align-items-center mt-5">
     <div class="card shadow-sm border-0 rounded-3 p-4" style="max-width: 600px; width: 100%;">
-
-        {{-- Validation Errors --}}
-        @if ($errors->any())
-            <div class="alert alert-danger mb-4">
-                <ul class="mb-0">
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
-
         {{-- Edit Form --}}
         <form action="{{ url('/user/update/' . $user->id) }}" method="POST" enctype="multipart/form-data">
             @csrf
@@ -71,8 +59,8 @@
 
             {{-- Buttons --}}
             <div class="d-flex justify-content-end mt-4 gap-3">
-                <a href="{{ url('/user/index') }}" class="btn btn-sm btn-outline-secondary">Back</a>
-                <button type="submit" class="btn btn-sm btn-primary">Update User</button>
+                <a href="{{ url('/user/index') }}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-arrow-left-circle"></i> Back</a>
+                <button type="submit" class="btn btn-sm btn-outline-primary">Submit</button>
             </div>
         </form>
     </div>

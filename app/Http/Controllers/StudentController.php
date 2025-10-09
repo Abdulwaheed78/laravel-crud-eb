@@ -14,9 +14,10 @@ class StudentController extends Controller
      */
     public function index()
     {
-        $students = Student::where('is_active','1')->latest()->paginate(10);
+        $students = Student::where('is_active', '1')->latest()->get();
         return view('students.index', compact('students'));
     }
+
 
     /**
      * Show the form for creating a new student.
@@ -91,6 +92,89 @@ class StudentController extends Controller
             ->with('success', 'Student update has been scheduled and will be processed shortly!');
     }
 
+
+    public function export()
+    {
+        $fileName = 'students_' . now()->format('Y-m-d_H-i-s') . '.csv';
+
+        $students = \App\Models\Student::orderBy('created_at', 'desc')->get();
+
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => "attachment; filename=\"$fileName\"",
+        ];
+
+        $callback = function () use ($students) {
+            $handle = fopen('php://output', 'w');
+
+            // Write CSV headers
+            fputcsv($handle, [
+                '_id',
+                'First Name',
+                'Last Name',
+                'Email',
+                'Phone',
+                'Roll Number',
+                'Age',
+                'Gender',
+                'Date of Birth',
+                'Admission Date',
+                'Class Time',
+                'Address',
+                'Bio',
+                'Course',
+                'Department',
+                'Batch',
+                'Is Active',
+                'Has Scholarship',
+                'Grade',
+                'Website',
+                'Favorite Color',
+                'Hobbies',
+                'Profile Photo',
+                'Created At',
+                'Updated At'
+            ]);
+
+            // Write each record
+            foreach ($students as $student) {
+                fputcsv($handle, [
+                    (string) $student->_id,
+                    $student->first_name,
+                    $student->last_name,
+                    $student->email,
+                    $student->phone,
+                    $student->roll_number,
+                    $student->age,
+                    $student->gender,
+                    $student->date_of_birth,
+                    $student->admission_date,
+                    $student->class_time,
+                    $student->address,
+                    $student->bio,
+                    $student->course,
+                    $student->department,
+                    $student->batch,
+                    $student->is_active ? 'Active' : 'Inactive',
+                    $student->has_scholarship ? 'Yes' : 'No',
+                    $student->grade,
+                    $student->website,
+                    $student->favorite_color,
+                    is_array($student->hobbies) ? implode(', ', $student->hobbies) : $student->hobbies,
+                    $student->profile_photo,
+                    optional($student->created_at)->format('Y-m-d H:i:s'),
+                    optional($student->updated_at)->format('Y-m-d H:i:s'),
+                ]);
+            }
+
+            fclose($handle);
+        };
+
+        return response()->streamDownload($callback, $fileName, $headers);
+    }
+
+
+
     /**
      * Remove the specified student from storage.
      */
@@ -118,6 +202,6 @@ class StudentController extends Controller
         // Dispatch job to process CSV
         ProcessStudentsCsv::dispatch($path);
 
-        return redirect()->back()->with('success', 'CSV uploaded successfully! Processing started...');
+        return redirect()->route('students.index')->with('success', 'CSV uploaded successfully! Processing started...');
     }
 }

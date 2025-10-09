@@ -8,6 +8,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
+use App\Events\UserActionEvent;
 
 class UserJob implements ShouldQueue
 {
@@ -29,7 +30,9 @@ class UserJob implements ShouldQueue
         Log::info("UserJob executed", [
             'action' => $this->action,
             'userId' => $this->userId,
-            'data'   => $this->data,
+            'data'   =>json_encode($this->data),
         ]);
+        Log::info("user event called");
+        event(new UserActionEvent($this->action, $this->userId, true));
     }
 }

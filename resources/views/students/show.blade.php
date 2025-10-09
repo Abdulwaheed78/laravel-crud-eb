@@ -144,15 +144,15 @@
                     @endif
 
                     <div class="mt-4 d-flex justify-content-end gap-3">
-                        <a href="{{ route('students.index') }}" class="btn btn-sm btn-outline-secondary">Back</a>
-                        <a href="{{ route('students.edit', $student->id) }}" class="btn btn-sm btn-warning">Edit</a>
+                        <a href="{{ route('students.index') }}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-arrow-left-circle"></i> Back</a>
+                        <a href="{{ route('students.edit', $student->id) }}" class="btn btn-sm btn-outline-warning"><i class="bi bi-pencil-square"></i> Edit</a>
                         <form action="{{ route('students.destroy', $student->id) }}" method="POST" class="d-inline">
                             @csrf
                             @method('DELETE')
                             <button type="submit"
-                                class="btn btn-sm btn-danger"
+                                class="btn btn-sm btn-outline-danger"
                                 onclick="return confirm('Are you sure you want to delete this student?')">
-                                Delete
+                                <i class="bi bi-trash3"></i> Delete
                             </button>
                         </form>
                     </div>

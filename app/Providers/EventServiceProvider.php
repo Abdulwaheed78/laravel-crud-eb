@@ -23,6 +23,13 @@ class EventServiceProvider extends ServiceProvider
         \App\Events\StudentActionEvent::class => [
             \App\Listeners\StudentActionListener::class,
         ],
+        \App\Events\ImageActionEvent::class => [
+            \App\Listeners\ImageActionListener::class,
+        ],
+        \App\Events\UserActionEvent::class => [
+            \App\Listeners\UserActionListener::class,
+        ],
+        
     ];
 
     /**

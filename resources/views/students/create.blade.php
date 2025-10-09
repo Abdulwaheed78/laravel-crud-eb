@@ -7,33 +7,6 @@
     <div class="card shadow-sm border-0 rounded-3 p-4" style="max-width: 800px; width: 100%;">
         <h3 class="mb-4 text-center">Create Student</h3>
 
-        {{-- ✅ Success Message --}}
-        @if (session('success'))
-        <div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
-            <strong>Success:</strong> {{ session('success') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-        @endif
-
-        {{-- ❌ Error Message (flashed from controller/job) --}}
-        @if (session('error'))
-        <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
-            <strong>Error:</strong> {{ session('error') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-        @endif
-
-        {{-- ⚠️ Validation Errors --}}
-        @if ($errors->any())
-        <div class="alert alert-danger mb-4">
-            <ul class="mb-0">
-                @foreach ($errors->all() as $error)
-                <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-        @endif
-
 
         {{-- Create Student Form --}}
         <form action="{{ route('students.store') }}" method="POST" enctype="multipart/form-data">
@@ -202,8 +175,8 @@
 
             {{-- Buttons --}}
             <div class="d-flex justify-content-end mt-4 gap-3">
-                <a href="{{ route('students.index') }}" class="btn btn-sm btn-outline-secondary">Back</a>
-                <button type="submit" class="btn btn-sm btn-primary">Create Student</button>
+                <a href="{{ route('students.index') }}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-arrow-left-circle"></i> Back</a>
+                <button type="submit" class="btn btn-sm btn-outline-primary">Submit</button>
             </div>
         </form>
     </div>

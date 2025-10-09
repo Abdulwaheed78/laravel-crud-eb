@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\ImageActionEvent;
 use Illuminate\Http\Request;
 use App\Jobs\StoreImageJob;
 use App\Models\Image;
@@ -12,7 +13,7 @@ class ImageController extends Controller
 {
     public function index()
     {
-        $images = Image::latest()->paginate(10);
+        $images = Image::latest()->get();
         return view('images.index', compact('images'));
     }
 
@@ -35,5 +36,20 @@ class ImageController extends Controller
         Log::info('📦 Image queued to Beanstalkd', ['path' => $tempPath]);
 
         return redirect()->back()->with('success', 'Image upload queued!');
+    }
+
+
+
+    public function delete($id)
+    {
+        $image = Image::find($id);
+        $image->delete();
+        event(new ImageActionEvent('deleted', $image->_id, true));
+        return redirect()
+            ->route('images.index')
+            ->with([
+                'success' => 'Image is scheduled for delete operation.',
+                'info' => 'The queue worker will process it soon.',
+            ]);
     }
 }

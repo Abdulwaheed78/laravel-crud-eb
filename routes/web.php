@@ -29,18 +29,32 @@ Route::post('/user/create', [UserController::class, 'create'])->name('userCreate
 Route::get('/user/edit/{id}', [UserController::class, 'edit'])->name('userEdit');
 Route::put('/user/update/{id}', [UserController::class, 'update'])->name('userUpdate');
 Route::get('/user/delete/{id}', [UserController::class, 'delete'])->name('userDelete');
+Route::get('/users/export', [UserController::class, 'export'])->name('users.export');
+Route::get('/users/upload', [UserController::class, 'showUploadForm'])->name('users.upload.form');
+Route::post('/users/upload', [UserController::class, 'uploadCsv'])->name('users.upload.csv');
 
 //Students Route
 Route::get('/students/upload', [StudentController::class, 'showUploadForm'])->name('students.upload.form');
 Route::post('/students/upload', [StudentController::class, 'uploadCsv'])->name('students.upload.csv');
-Route::resource('students', StudentController::class);
+Route::get('/students/export', [StudentController::class, 'export'])->name('students.export');
+Route::get('/students/data', [StudentController::class, 'getData'])->name('students.data');
+
+Route::resource('students', StudentController::class); // define all other routes for resource before main resource route
 
 
 //images direct upload to db 
 Route::get('/images', [ImageController::class, 'index'])->name('images.index');
 Route::post('/images', [ImageController::class, 'store'])->name('images.store');
+Route::delete('/images/{id}', [ImageController::class, 'delete'])->name('images.delete');
 
 
 //for notification
 Route::get('/notifications', [NotificationController::class, 'index']);
+Route::get('/notifications/full', [NotificationController::class, 'list'])->name('notifications.list');
+Route::delete('/notifications/{id}', [NotificationController::class, 'destroy'])->name('notifications.destroy');
+Route::delete('/notifications/bulk-delete', [NotificationController::class, 'bulkDelete'])
+    ->name('notifications.bulkDelete');
+
 Route::post('/notifications/mark-as-read', [NotificationController::class, 'markAsRead']);
+Route::get('/notifications/export', [NotificationController::class, 'exportCsv'])
+    ->name('notifications.export');

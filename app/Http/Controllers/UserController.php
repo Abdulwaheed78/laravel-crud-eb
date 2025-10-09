@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Jobs\UserJob;
+use App\Jobs\ProcessUser;
 use Illuminate\Support\Facades\Storage;
 
 class UserController extends Controller
@@ -12,9 +13,10 @@ class UserController extends Controller
     // Show all users
     public function index()
     {
-        $users = User::orderBy('_id','desc')->get();
+        $users = User::orderBy('_id', 'desc')->get(); // 10 users per page
         return view('users.index', compact('users'));
     }
+
 
     // Store a new user
     public function create(Request $request)
@@ -37,7 +39,11 @@ class UserController extends Controller
         ]);
 
         // dispatch log job
-        UserJob::dispatch('create', [], $user->id);
+        UserJob::dispatch('create', [
+            'id' => $user->id,
+            'first_name' => $user->name,
+            'email' => $user->email,
+        ], $user->id);
 
         return redirect()->route('userIndex')->with('success', 'User created successfully!');
     }
@@ -73,10 +79,45 @@ class UserController extends Controller
         $user->save();
 
         // dispatch log job
-        UserJob::dispatch('update', [], $user->id);
+        UserJob::dispatch('update', [
+            'id' => $user->id,
+            'first_name' => $user->name,
+            'email' => $user->email,
+        ], $user->id);
 
         return redirect()->route('userIndex')->with('success', 'User updated successfully!');
     }
+
+    public function export()
+    {
+        $fileName = 'users_' . now()->format('Y-m-d_H-i-s') . '.csv';
+        $users = \App\Models\User::all(['id', 'image', 'name', 'email', 'created_at']);
+
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => "attachment; filename=\"$fileName\"",
+        ];
+
+        $callback = function () use ($users) {
+            $handle = fopen('php://output', 'w');
+            fputcsv($handle, ['ID', 'Image', 'Name', 'Email', 'Created At']);
+
+            foreach ($users as $user) {
+                fputcsv($handle, [
+                    $user->id,
+                    $user->image,
+                    $user->name,
+                    $user->email,
+                    $user->created_at->format('Y-m-d H:i'),
+                ]);
+            }
+
+            fclose($handle);
+        };
+
+        return response()->streamDownload($callback, $fileName, $headers);
+    }
+
 
     // Delete user
     public function delete($id)
@@ -90,8 +131,31 @@ class UserController extends Controller
         $user->delete();
 
         // dispatch log job
-        UserJob::dispatch('delete', [], $id);
+        UserJob::dispatch('delete', [
+            'id' => $user->id,
+            'first_name' => $user->name,
+            'email' => $user->email,
+        ], $user->id);
 
         return redirect()->route('userIndex')->with('success', 'User deleted successfully!');
+    }
+
+
+    public function showUploadForm()
+    {
+        return view('users.upload');
+    }
+
+    public function uploadCsv(Request $request)
+    {
+        $request->validate([
+            'csv_file' => 'required|mimes:csv,txt|max:2048',
+        ]);
+
+        $path = $request->file('csv_file')->store('uploads', 'public');
+
+        // Dispatch job to process CSV
+        ProcessUser::dispatch($path);
+        return redirect()->route('userIndex')->with('success', 'Users CSV uploaded successfully! Processing started...');
     }
 }
