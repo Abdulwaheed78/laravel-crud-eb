@@ -51,7 +51,6 @@ Route::delete('/images/{id}', [ImageController::class, 'delete'])->name('images.
 //for notification
 Route::get('/notifications', [NotificationController::class, 'index']);
 Route::get('/notifications/full', [NotificationController::class, 'list'])->name('notifications.list');
-Route::delete('/notifications/{id}', [NotificationController::class, 'destroy'])->name('notifications.destroy');
 Route::delete('/notifications/bulk-delete', [NotificationController::class, 'bulkDelete'])
     ->name('notifications.bulkDelete');
 

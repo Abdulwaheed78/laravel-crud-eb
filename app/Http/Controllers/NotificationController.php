@@ -21,7 +21,7 @@ class NotificationController extends Controller
 
     public function list()
     {
-        $notifications = \App\Models\Notification::orderBy('_id','desc')->get();
+        $notifications = \App\Models\Notification::orderBy('_id', 'desc')->get();
 
         return view('notifications.index', compact('notifications'));
     }
@@ -39,33 +39,16 @@ class NotificationController extends Controller
     }
 
 
-    public function destroy($id)
-    {
-        $notification = \App\Models\Notification::find($id);
-
-        if (!$notification) {
-            return redirect()->route('notifications.list')->with('error', 'Notification not found.');
-        }
-
-        $notification->delete();
-
-        return redirect()->route('notifications.list')->with('success', 'Notification deleted successfully.');
-    }
-
-
     public function bulkDelete(Request $request)
     {
         $ids = $request->input('ids', []);
-
         if (empty($ids)) {
             return redirect()->route('notifications.list')->with('error', 'No notifications selected.');
         }
 
-        \App\Models\Notification::whereIn('_id', $ids)->delete();
-
+        Notification::whereIn('_id', $ids)->delete();
         return redirect()->route('notifications.list')->with('success', 'Selected notifications deleted successfully.');
     }
-
 
     public function exportCsv()
     {
