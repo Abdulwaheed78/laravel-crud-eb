@@ -26,18 +26,18 @@ class StudentActionListener
             ]);
 
 
-            $message = $student
-                ? "Student {$student->first_name} {$student->last_name} was {$event->action}."
-                : "Student with ID {$event->studentId} was {$event->action}.";
+            // $message = $student
+            //     ? "Student {$student->first_name} {$student->last_name} was {$event->action}."
+            //     : "Student with ID {$event->studentId} was {$event->action}.";
 
-            Notification::create([
-                'type' => 'student_action',
-                'title' => "Student {$event->action}",
-                'message' => $message,
-                'related_id' => $event->studentId,
-                'related_model' => Student::class,
-                'is_read' => false,
-            ]);
+            // Notification::create([
+            //     'type' => 'student_action',
+            //     'title' => "Student {$event->action}",
+            //     'message' => $message,
+            //     'related_id' => $event->studentId,
+            //     'related_model' => Student::class,
+            //     'is_read' => false,
+            // ]);
         } else {
             Log::warning('⚠️ Student not found for ID: ' . $event->studentId);
         }
